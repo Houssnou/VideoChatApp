@@ -1,3 +1,7 @@
+using VideoChatApp.Abstractions;
+using VideoChatApp.Hubs;
+using VideoChatApp.Options;
+using VideoChatApp.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -23,10 +27,11 @@ namespace VideoChatApp
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             // In production, the Angular files will be served from this directory
-            services.AddSpaStaticFiles(configuration =>
-            {
-                configuration.RootPath = "ClientApp/dist";
-            });
+            services.Configure<TwilioSettings>(Configuration.GetSection(nameof(TwilioSettings)))
+                    .AddTransient<IVideoService, VideoService>()
+                    .AddSpaStaticFiles(configuration => configuration.RootPath = "ClientApp/dist/ClientApp");
+
+            services.AddSignalR();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -46,6 +51,8 @@ namespace VideoChatApp
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
+
+            app.UseSignalR(routes => { routes.MapHub<NotificationHub>("/notificationHub"); });
 
             app.UseMvc(routes =>
             {

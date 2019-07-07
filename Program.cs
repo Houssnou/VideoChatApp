@@ -14,11 +14,10 @@ namespace VideoChatApp
     {
         public static void Main(string[] args)
         {
-            CreateWebHostBuilder(args).Build().Run();
+            WebHostExtensions.Run(CreateWebHostBuilder(args).Build());
         }
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>();
+            WebHostBuilderExtensions.UseStartup<Startup>(WebHost.CreateDefaultBuilder(args));
     }
 }
